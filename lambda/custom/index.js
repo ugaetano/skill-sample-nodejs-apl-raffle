@@ -5,10 +5,10 @@ let min = 1
 let max = 189
 
 // Welcome message string
-let welcomeMessage = "Ciao, benvenuti all estrazione."
+let welcomeMessage = "Ciao, benvenuti all estrazione. "
 
 // URL for the background image
-let imageURL = 'https://example/image.png'
+let imageURL = 'https://alexa-presentation-language.s3-eu-west-1.amazonaws.com/assets/solid-white.jpg'
 
 // Random phrases for the ExtractAgainIntent
 let phrases = [
@@ -19,6 +19,21 @@ let phrases = [
         "Certo, il prossimo numero é "
         ]
         
+// Generic function to check interface availability on calling device
+function supportsInterface(handlerInput, interfaceName){
+    const interfaces = ((((
+        handlerInput.requestEnvelope.context || {})
+        .System || {})
+        .device || {})
+        .supportedInterfaces || {});
+    return interfaces[interfaceName] !== null && interfaces[interfaceName] !== undefined;
+}
+
+// Check for APL Interface availability on calling device
+function supportsAPL(handlerInput) {
+    return supportsInterface(handlerInput, 'Alexa.Presentation.APL')
+}
+
 function getRandomInt(min, max) {
     //The maximum is exclusive and the minimum is inclusive
     min = Math.ceil(min);
@@ -39,22 +54,36 @@ const LaunchRequestHandler = {
     },
     handle(handlerInput) {
         
-        let randomNumber = getRandomInt(min,max)
-        const speakOutput = welcomeMessage + 'Il numero fortunato é ' + randomNumber;
+        let speakOutput;
+        if (supportsAPL(handlerInput))
+        {
+            let randomNumber = getRandomInt(min,max)
+            speakOutput = welcomeMessage + 'Il numero fortunato é ' + randomNumber;
+            return handlerInput.responseBuilder
+                .speak(speakOutput)
+                .addDirective({
+            type:'Alexa.Presentation.APL.RenderDocument',
+            token :'documentToken',
+            document: require ('./extraction.json'),
+            datasources: {
+                    "data": {
+                        "number":randomNumber,
+                        "imageURL": imageURL
+                    }
+                },
+            })
+            .getResponse();
+    }
+
+    else
+
+    {
+        speakOutput = "Mi dispiace, al momento questa skill supporta solo dispositivi con display"
         return handlerInput.responseBuilder
-            .speak(speakOutput)
-             .addDirective({
-          type:'Alexa.Presentation.APL.RenderDocument',
-          token :'documentToken',
-          document: require ('./extraction.json'),
-          datasources: {
-                "data": {
-                    "number":randomNumber,
-                    "imageURL": imageURL
-                }
-            },
-        })
+        .speak(speakOutput)
         .getResponse();
+    }
+
     }
 };
 
@@ -65,22 +94,35 @@ const ExtractAgainIntentHandler = {
     },
     handle(handlerInput) {
         
-        let randomNumber = getRandomInt(min,max)
-        const speakOutput = getRandomExtractionPhrase(randomNumber);
+        if (supportsAPL(handlerInput))
+        {
+            let randomNumber = getRandomInt(min,max)
+            const speakOutput = getRandomExtractionPhrase(randomNumber);
+            return handlerInput.responseBuilder
+                .speak(speakOutput)
+                .addDirective({
+            type:'Alexa.Presentation.APL.RenderDocument',
+            token :'documentToken',
+            document: require ('./extraction.json'),
+            datasources: {
+                    "data": {
+                        "number":randomNumber,
+                        "imageURL": imageURL
+                    }
+                },
+            })
+            .getResponse();
+    }
+
+    else
+    {
+        speakOutput = "Mi dispiace, al momento questa skill supporta solo dispositivi con display"
         return handlerInput.responseBuilder
-            .speak(speakOutput)
-             .addDirective({
-          type:'Alexa.Presentation.APL.RenderDocument',
-          token :'documentToken',
-          document: require ('./extraction.json'),
-          datasources: {
-                "data": {
-                    "number":randomNumber,
-                    "imageURL": imageURL
-                }
-            },
-        })
+        .speak(speakOutput)
         .getResponse();
+    }
+
+
     }
 };
 const HelpIntentHandler = {
