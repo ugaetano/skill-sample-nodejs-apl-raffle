@@ -1,0 +1,81 @@
+{
+    "type": "APL",
+    "version": "1.1",
+    "settings": {
+        "idleTimeout": 990000
+    },
+    "theme": "light",
+    "import": [],
+    "resources": [],
+    "styles": {},
+    "onMount": {
+        "type": "AnimateItem",
+        "easing": "ease-in-out",
+        "duration": 3500,
+        "componentId": "myText",
+        "value": [
+            {
+                "property": "opacity",
+                "to": 1
+            },
+            {
+                "property": "transform",
+                "from": [
+                    {
+                        "translateX": 2000
+                    },
+                    {
+                        "rotate": 360
+                    }
+                ],
+                "to": [
+                    {
+                        "translateX": 0
+                    },
+                    {
+                        "rotate": 0
+                    }
+                ]
+            }
+        ]
+    },
+    "graphics": {},
+    "commands": {},
+    "layouts": {},
+    "mainTemplate": {
+        "parameters": [
+            "payload"
+        ],
+        "items": [
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "Image",
+                        "width": "100%",
+                        "height": "100%",
+                        "source": "${payload.data.imageURL}",
+                        "scale": "best-fill",
+                        "position": "absolute"
+                    },
+                    {
+                        "type": "Container",
+                        "item": [
+                            {
+                                "type": "Text",
+                                "id": "myText",
+                                "width": "100vw",
+                                "height": "100vh",
+                                "textAlign": "center",
+                                "textAlignVertical": "center",
+                                "fontStyle": "italic",
+                                "fontSize": "450",
+                                "text": "${payload.data.number}"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
